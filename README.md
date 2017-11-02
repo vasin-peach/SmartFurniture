@@ -6,6 +6,9 @@
 ## Build Setup
 
 ``` bash
+# install nodeJs
+download and install nodeJs
+
 # install dependencies
 npm install
 
