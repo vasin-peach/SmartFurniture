@@ -1,6 +1,7 @@
-# smart_furniture
+# Smart Furniture
 
-> A Project call 'Smart Furniture' 
+> "Smart Furniture" is a webshop that can recommend product(Furnuture) to you, based on user usage.
+   It was assigned to Computer Programming.
 
 ## Build Setup
 
