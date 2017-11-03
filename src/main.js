@@ -3,8 +3,12 @@
 import Vue from 'vue'
 import VeeValidate from 'vee-validate'
 import Firebase from 'firebase'
+
 import App from './App'
 import router from './router'
+
+
+
 
 Vue.config.productionTip = false
 

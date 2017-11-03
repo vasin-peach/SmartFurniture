@@ -1,10 +1,10 @@
 <template>
-<div class="modal fade" id="popup-register" role="dialog">
+<div class="modal fade" id="popup-other" role="dialog">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Register</h4>
+                <h4 class="modal-title">Other</h4>
             </div>
             <div class="modal-body">
                 <p>This is a small modal.</p>

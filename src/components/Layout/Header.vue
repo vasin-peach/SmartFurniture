@@ -10,20 +10,20 @@
                     <input type="text" placeholder="Search">
                 </div>
                 <ul class="nav navbar-nav navbar-right col col-xs-3 row">
-                    <li class="col col-sm-4 dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" style="font-size: 22px;"><i class="fa fa-ellipsis-h" aria-hidden="true" style="cursor:pointer"></i></a>
+                    <li class="col col-sm-4 dropdown" style="cursor:pointer">
+                        <a class="dropdown-toggle" data-toggle="dropdown" style="font-size: 22px;"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
-                            <li>
-                                <router-link :to="{ name:'Login' }" id="login"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i> <span>Sign In</span></router-link>
+                            <li data-toggle="modal" data-target="#popup-login">
+                                <a href="#" id="login"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign In</span></a>
                             </li>
-                            <li>
-                                <router-link :to="{ name:'Register'}" id="register"><i class="fa fa-user-plus" aria-hidden="true" title="Sign Up"></i> <span>Sign Up</span></router-link>
+                            <li data-toggle="modal" data-target="#popup-register">
+                                <a href="#" id="register"><i class="fa fa-user-plus" aria-hidden="true" title="Sign Up"></i><span> Sign Up</span></a>
                             </li>
                         </ul>
                     </li>
 
                     <li class="col col-sm-4">
-                        <a href="#">Test</a>
+                        <router-link :to="{ name: 'Cart' }" id="cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>Cart</span></router-link>
                     </li>
                     <li class="col col-sm-4">
                         <router-link :to="{ name: 'Home' }" id="home"><i class="fa fa-home" aria-hidden="true" title="Home"></i> <span>Home</span></router-link>
@@ -34,14 +34,14 @@
         <nav class="mobile navbar navbar-default navbar-fixed-bottom">
             <div class="container-fluid">
                 <ul class="nav navbar-nav navbar-right row">          
-                    <li class="col col-xs-3">
-                        <router-link :to="{ name:'Login' }" id="login"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i> <span>Sign In</span></router-link>
+                    <li class="col col-xs-3" data-toggle="modal" data-target="#popup-other">
+                        <a href="#" id="other"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
                     </li>
                     <li class="col col-xs-3">
-                        <router-link :to="{ name:'Register'}" id="register"><i class="fa fa-user-plus" aria-hidden="true" title="Sign Up"></i> <span>Sign Up</span></router-link>
+                        <router-link :to="{ name: 'Cart' }" id="cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></router-link>
                     </li>
                     <li class="col col-xs-3">
-                        <router-link :to="{ name: 'Home' }" id="home"><i class="fa fa-home" aria-hidden="true" title="Home"></i> <span>Home</span></router-link>
+                        <router-link :to="{ name: 'Home' }" id="home"><i class="fa fa-home" aria-hidden="true" title="Home"></i></router-link>
                     </li>
                     <li class="col col-xs-3">
                         <a class="navbar-brand">Smart</a>
@@ -49,29 +49,49 @@
                 </ul>
             </div>
         </nav>
+
+        <!-- Load All Popup -->
+        <div v-for="popup in popupList">
+            <div :is="popup"> </div>
+        </div>
+
+
     </div>
 </template>
 
 <script>
+import Login from '@/components/Auth/Login'
+import Register from '@/components/Auth/Register'
+import Other from '@/components/Other'
+
 export default {
     name: 'Header',
+    // beforeRouteUpdate(to, from, next) { // Navbar active animation
+    //     var navCurrent = $('#' + from.path.split('/')[1].toLowerCase())
+    //     var navNext = $('#' + to.path.split('/')[1].toLowerCase())
+    //     navCurrent.parent().removeClass('active')
+    //     navNext.parent().addClass('active')
+    //     next()
+    // }
     data() {
         return {
-            navActive: 'home'
+            popupList: ['login', 'register', 'other']
         }
+
     },
-    beforeRouteUpdate(to, from, next) { // Navbar active animation
-        var navCurrent = $('#' + from.path.split('/')[1].toLowerCase())
-        var navNext = $('#' + to.path.split('/')[1].toLowerCase())
-        navCurrent.parent().removeClass('active')
-        navNext.parent().addClass('active')
-        next()
-  }
+    components: {
+        'login' : Login,
+        'register' : Register,
+        'other' : Other
+    }
 }
 </script>
 
-<style>
 
+
+
+
+<style>
 .mobile {
     display: none;
 }
@@ -107,10 +127,15 @@ export default {
         padding-top: 10px;
         height: 40px;
         border-radius: 30px;
+        transition: background .5s;
     }
     .navbar-right > li > a:not(.navbar-brand):active {
         box-shadow: 0 0 0 2px #000;
     }
+    .navbar-right > li:hover > a:not(.navbar-brand){
+        background-color: #e8e8e8;
+    }
+    .navbar-right 
     .navbar-header {
         padding-left: 25px;
     }
