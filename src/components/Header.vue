@@ -10,11 +10,20 @@
                     <input type="text" placeholder="Search">
                 </div>
                 <ul class="nav navbar-nav navbar-right col col-xs-3 row">
-                    <li class="col col-sm-4">
-                        <router-link :to="{ name:'Login' }" id="login"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i> <span>Sign In</span></router-link>
+                    <li class="col col-sm-4 dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-ellipsis-h" aria-hidden="true" style="cursor:pointer"></i></a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <router-link :to="{ name:'Login' }" id="login"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i> <span>Sign In</span></router-link>
+                            </li>
+                            <li>
+                                <router-link :to="{ name:'Register'}" id="register"><i class="fa fa-user-plus" aria-hidden="true" title="Sign Up"></i> <span>Sign Up</span></router-link>
+                            </li>
+                        </ul>
                     </li>
+
                     <li class="col col-sm-4">
-                        <router-link :to="{ name:'Register'}" id="register"><i class="fa fa-user-plus" aria-hidden="true" title="Sign Up"></i> <span>Sign Up</span></router-link>
+                        <a href="#">Test</a>
                     </li>
                     <li class="col col-sm-4">
                         <router-link :to="{ name: 'Home' }" id="home"><i class="fa fa-home" aria-hidden="true" title="Home"></i> <span>Home</span></router-link>
@@ -35,7 +44,7 @@
                         <router-link :to="{ name: 'Home' }" id="home"><i class="fa fa-home" aria-hidden="true" title="Home"></i> <span>Home</span></router-link>
                     </li>
                     <li class="col col-xs-3">
-                        <a>Smart</a>
+                        <a class="navbar-brand">Smart</a>
                     </li>       
                 </ul>
             </div>
@@ -71,8 +80,7 @@ export default {
     padding: 0;
 }
 .search, .navbar-header, .navbar-right > li {
-    padding-top: 7px;
-    padding-bottom: 7px;
+    padding: 7px;
 }
 
 
@@ -85,7 +93,7 @@ export default {
         height: 40px;
         border-radius: 30px;
     }
-    .navbar-right > li > a:active {
+    .navbar-right > li > a:not(.navbar-brand):active {
         box-shadow: 0 0 0 2px #000;
     }
     .navbar-header {
@@ -127,7 +135,7 @@ export default {
     padding: 10px;
     pointer-events: none;
     }
-    .left-addon .fa  { left:  0px;}
+    .left-addon .fa  { left:  5px;}
     .left-addon input  { padding-left:  40px; }
 
 
@@ -157,6 +165,6 @@ export default {
         padding: 10px 20px 10px 20px;
         width: 100%;
     }
-    .left-addon .fa  { left:  20px;}
+    .left-addon .fa  { left: 20px;}
 }
 </style>
