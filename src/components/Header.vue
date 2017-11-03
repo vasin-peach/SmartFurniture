@@ -11,7 +11,7 @@
                 </div>
                 <ul class="nav navbar-nav navbar-right col col-xs-3 row">
                     <li class="col col-sm-4 dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-ellipsis-h" aria-hidden="true" style="cursor:pointer"></i></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" style="font-size: 22px;"><i class="fa fa-ellipsis-h" aria-hidden="true" style="cursor:pointer"></i></a>
                         <ul class="dropdown-menu">
                             <li>
                                 <router-link :to="{ name:'Login' }" id="login"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i> <span>Sign In</span></router-link>
@@ -82,6 +82,21 @@ export default {
 .search, .navbar-header, .navbar-right > li {
     padding: 7px;
 }
+
+.dropdown-menu {
+    padding-bottom: 0px;
+    padding-top: 0px;
+    box-shadow: none;
+    border-bottom-left-radius: 30px;
+}
+    .dropdown-menu > li > a {
+        padding: 10px 10px 10px 40px;
+        
+    }
+        .dropdown-menu > li:last-child a{
+            border-bottom-left-radius: 30px;
+        }
+        
 
 
 .navbar-right > li {
