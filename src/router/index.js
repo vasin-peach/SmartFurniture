@@ -10,8 +10,6 @@ import Footer from '@/components/Layout/Footer'
 
 import About from '@/components/About'
 
-import Login from '@/components/Auth/Login'
-import Register from '@/components/Auth/Register'
 
 import Product from '@/components/Store/Product'
 import Cart from '@/components/Store/Cart'
@@ -32,8 +30,6 @@ export default new Router({
         { path: '/', redirect: '/home'},
         { path: '/home', component: Product, name: 'Home'},
         { path: '/about', component: About, name: 'About'},
-        { path: '/login', component: Login, name: 'Login'},
-        { path: '/register', component: Register, name: 'Register'},
         { path: '/cart', component: Cart, name: 'Cart'}
       ]
     }

@@ -10,22 +10,27 @@
                     <input type="text" placeholder="Search">
                 </div>
                 <ul class="nav navbar-nav navbar-right col col-xs-3 row">
-                    <li class="col col-sm-4 dropdown" style="cursor:pointer">
+
+                    <li class="col col-sm-3 dropdown" style="cursor:pointer">
                         <a class="dropdown-toggle" data-toggle="dropdown" style="font-size: 22px;"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
-                            <li data-toggle="modal" data-target="#popup-login">
-                                <a href="#" id="login"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign In</span></a>
+                            <li v-if="!auth">
+                                <a href="#" id="login" @click="login()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign In</span></a>
                             </li>
-                            <li data-toggle="modal" data-target="#popup-register">
-                                <a href="#" id="register"><i class="fa fa-user-plus" aria-hidden="true" title="Sign Up"></i><span> Sign Up</span></a>
+                            <li v-if="auth">
+                                <a href="#" id="login" @click="logout()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign Out</span></a>
                             </li>
                         </ul>
                     </li>
-
-                    <li class="col col-sm-4">
+                    <transition name="profile-fade">
+                        <li class="col col-sm-3 profile-img" v-if="auth">
+                            <router-link :to="{ name: 'Home' }" id="home"><img :src="auth.photoURL"></router-link>
+                        </li>
+                     </transition>
+                    <li class="col col-sm-3">
                         <router-link :to="{ name: 'Cart' }" id="cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>Cart</span></router-link>
                     </li>
-                    <li class="col col-sm-4">
+                    <li class="col col-sm-3">
                         <router-link :to="{ name: 'Home' }" id="home"><i class="fa fa-home" aria-hidden="true" title="Home"></i> <span>Home</span></router-link>
                     </li>
                 </ul>
@@ -33,7 +38,7 @@
         </nav>
         <nav class="mobile navbar navbar-default navbar-fixed-bottom">
             <div class="container-fluid">
-                <ul class="nav navbar-nav navbar-right row">          
+                <ul class="nav navbar-nav navbar-right row">     
                     <li class="col col-xs-3" data-toggle="modal" data-target="#popup-other">
                         <a href="#" id="other"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
                     </li>
@@ -55,14 +60,15 @@
             <div :is="popup"> </div>
         </div>
 
-
     </div>
 </template>
 
 <script>
-import Login from '@/components/Auth/Login'
-import Register from '@/components/Auth/Register'
+import firebase from 'firebase'
 import Other from '@/components/Other'
+
+
+
 
 export default {
     name: 'Header',
@@ -73,18 +79,47 @@ export default {
     //     navNext.parent().addClass('active')
     //     next()
     // }
+    created() {
+        firebase.auth().onAuthStateChanged(user => {
+            if(user) {
+                this.auth = user
+            } else {
+                this.auth = false
+                console.log('PLEASE LOGIN')
+            }
+        });
+    },
     data() {
         return {
-            popupList: ['login', 'register', 'other']
+            popupList: ['other'],
+            displayName: null,
+            photoURL: null,
+            user: null,
+            auth: false,
         }
-
     },
     components: {
-        'login' : Login,
-        'register' : Register,
         'other' : Other
+    },
+    methods: {
+        login() {
+            const this_ = this
+            if (!this.auth) {
+                firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).then( function() {
+                    const provider = new firebase.auth.FacebookAuthProvider()
+                    return firebase.auth().signInWithPopup(provider)
+                }).catch(function(error) { console.log(error) })
+            }
+        },
+        logout() {
+            const this_ = this
+            firebase.auth().signOut().then(function () {
+                // location.reload()
+            }).catch (function(error) { console.log(error) })
+        }
     }
 }
+
 </script>
 
 
@@ -111,7 +146,6 @@ export default {
 }
     .dropdown-menu > li > a {
         padding: 10px 10px 10px 40px;
-        
     }
         .dropdown-menu > li:last-child a{
             border-bottom-left-radius: 30px;
@@ -129,10 +163,19 @@ export default {
         border-radius: 30px;
         transition: background .5s;
     }
-    .navbar-right > li > a:not(.navbar-brand):active {
+    .navbar-right .profile-img a{
+        padding: 0;
+    }
+        .navbar-right .profile-img img {
+            border-radius: 50%;
+            width: 37px;
+            height: 37px;
+            margin-top: 2px;
+        }
+    .navbar-right > li:not(.profile-img) > a:not(.navbar-brand):active {
         box-shadow: 0 0 0 2px #000;
     }
-    .navbar-right > li:hover > a:not(.navbar-brand){
+    .navbar-right > li:not(.profile-img):hover > a:not(.navbar-brand){
         background-color: #e8e8e8;
     }
     .navbar-right 
@@ -178,6 +221,23 @@ export default {
     .left-addon .fa  { left:  5px;}
     .left-addon input  { padding-left:  40px; }
 
+.modal-dialog {
+  margin-top: 0;
+  margin-bottom: 0;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.modal.fade .modal-dialog {
+  transform: translate(0, -100%);
+}
+
+.modal.in .modal-dialog {
+  transform: translate(0, 0);
+}
+
 
 
 @media (max-width: 992px) {
@@ -206,5 +266,27 @@ export default {
         width: 100%;
     }
     .left-addon .fa  { left: 20px;}
+}
+
+
+
+
+
+
+
+
+/* Vue */
+.profile-fade-enter-active {
+    transition: all 1s;
+}
+.profile-fade-leave-active {
+    transition: all 1s;
+}
+.profile-fade-enter, .profile-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+    width: 30px;
+    height: 30px;
+    transform: translateX(5px);
+    opacity: 0;
 }
 </style>
