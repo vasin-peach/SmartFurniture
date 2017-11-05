@@ -12,6 +12,7 @@ import About from '@/components/About'
 
 import Product from '@/components/Store/Product'
 import Cart from '@/components/Store/Cart'
+import Search from '@/components/Store/Search'
 
 
 import Json from '@/components/Json'
@@ -36,6 +37,7 @@ export default new Router({
         { path: '/about', component: About, name: 'About'},
         { path: '/cart', component: Cart, name: 'Cart', meta: { requiresAuth: true }},
         { path: '/json', component: Json, name: 'Json', meta: { requiresAuth: true }},
+        { path: '/search/:tag', component: Search, name: 'Search', meta: { requiresAuth: true}}
       ]
     }
   ]

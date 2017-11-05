@@ -40,7 +40,7 @@ export default {
 
                     var image = value.image
 
-                    var allTag = (((value.tag1 +' '+ value.tag2.replace('last year’s price', "")).replace(/([0-9]|\n|\r|\t|\+|)/g, "")).replace(/\-/, "")).split(' ')
+                    var allTag = (((value.tag1 +' '+ value.tag2.replace('last year’s price', "")).replace(/([0-9]|\n|\r|\t|\+|)/g, "")).replace(/\-/, "").replace(/\//g, '-')).split(' ')
                     var rmTag = ['of', 'and', 'with', 'for', 'unit', 'w', 'f', "+", "-"]
                     function tagRemove(arr, word) {
                         var found = arr.indexOf(word)
