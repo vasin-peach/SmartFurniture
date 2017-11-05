@@ -2,8 +2,9 @@
     <div>
         <nav class="pc navbar navbar-default navbar-fixed-top">
             <div class="container-fluid row">
-                <div class="navbar-header col col-xs-1">
-                    <a class="navbar-brand">Smart</a>
+                <div class="navbar-header col col-xs-1 ">
+                    <router-link :to="{ name: 'Home'}" id="home" class="navbar-brand">Smart</router-link>
+                    <!-- <a class="navbar-brand">Smart</a> -->
                 </div>
                 <div class="search navbar-left col col-xs-8 inner-addon left-addon">
                     <i class="fa fa-search" aria-hidden="true"></i>
@@ -11,7 +12,7 @@
                 </div>
                 <ul class="nav navbar-nav navbar-right col col-xs-3 row">
 
-                    <li class="col col-sm-3 dropdown" style="cursor:pointer">
+                    <li class="col col-xs-3 dropdown" style="cursor:pointer">
                         <a class="dropdown-toggle" data-toggle="dropdown" style="font-size: 22px;"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
                             <li v-if="!auth">
@@ -23,19 +24,20 @@
                         </ul>
                     </li>
                     <transition name="profile-fade">
-                        <li class="col col-sm-3 profile-img" v-if="auth">
+                        <li class="col col-xs-3 profile-img" v-if="auth">
                             <router-link :to="{ name: 'Home' }" id="home"><img :src="auth.photoURL"></router-link>
                         </li>
-                     </transition>
-                    <li class="col col-sm-3">
+                    </transition>
+                    <li class="col col-xs-3 ">
                         <router-link :to="{ name: 'Cart' }" id="cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>Cart</span></router-link>
                     </li>
-                    <li class="col col-sm-3">
+                    <li class="col col-xs-3">
                         <router-link :to="{ name: 'Home' }" id="home"><i class="fa fa-home" aria-hidden="true" title="Home"></i> <span>Home</span></router-link>
                     </li>
                 </ul>
             </div>
         </nav>
+        
         <nav class="mobile navbar navbar-default navbar-fixed-bottom">
             <div class="container-fluid">
                 <ul class="nav navbar-nav navbar-right row">     
@@ -45,19 +47,38 @@
                     <li class="col col-xs-3">
                         <router-link :to="{ name: 'Cart' }" id="cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></router-link>
                     </li>
+                    <transition name="profile-fade">
+                        <li class="col col-xs-3 profile-img" v-if="auth">
+                            <router-link :to="{ name: 'Home' }" id="home"><img :src="auth.photoURL"></router-link>
+                        </li>
+                    </transition>
                     <li class="col col-xs-3">
-                        <router-link :to="{ name: 'Home' }" id="home"><i class="fa fa-home" aria-hidden="true" title="Home"></i></router-link>
-                    </li>
-                    <li class="col col-xs-3">
-                        <a class="navbar-brand">Smart</a>
+                        <router-link :to="{ name: 'Home'}" id="home" class="navbar-brand">Smart</router-link>
                     </li>       
                 </ul>
             </div>
         </nav>
 
-        <!-- Load All Popup -->
-        <div v-for="popup in popupList">
-            <div :is="popup"> </div>
+        <div class="modal fade" id="popup-other" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Menu</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div v-if="!auth">
+                            <a href="#" id="login" @click="login()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign In</span></a>
+                        </div>
+                        <div v-if="auth">
+                            <a href="#" id="login" @click="logout()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign Out</span></a>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -65,7 +86,6 @@
 
 <script>
 import firebase from 'firebase'
-import Other from '@/components/Other'
 
 
 
@@ -81,11 +101,32 @@ export default {
     // }
     created() {
         firebase.auth().onAuthStateChanged(user => {
+
+            var searchInput = $('.search > input')
+            var navBarTop = $('.navbar-right > li')
             if(user) {
                 this.auth = user
+                searchInput.prop('disabled', false);
+                searchInput.removeClass('search-disable');
+
+                // Add user to database
+                const pushData = {
+                    'uid': this.auth.uid,
+                    'name': this.auth.displayName,
+                    'email': this.auth.email,
+                    'phone': this.auth.phoneNumber
+                }
+                firebase.database().ref('users/').orderByChild('uid').equalTo(this.auth.uid).once('value').then( function(snapshot) {
+                    // Check is exist
+                    if (!snapshot.val()) {
+                        firebase.database().ref('users/').push(pushData)
+                    }
+                })
+
             } else {
                 this.auth = false
-                console.log('PLEASE LOGIN')
+                searchInput.prop('disabled', true);
+                searchInput.addClass('search-disable');
             }
         });
     },
@@ -99,7 +140,6 @@ export default {
         }
     },
     components: {
-        'other' : Other
     },
     methods: {
         login() {
@@ -112,10 +152,11 @@ export default {
             }
         },
         logout() {
-            const this_ = this
-            firebase.auth().signOut().then(function () {
-                // location.reload()
-            }).catch (function(error) { console.log(error) })
+            if (this.auth) {
+                const this_ = this
+                firebase.auth().signOut().then(function () {
+                }).catch (function(error) { console.log(error) })
+            }
         }
     }
 }
@@ -127,6 +168,9 @@ export default {
 
 
 <style>
+/* .nav .col-xs-3, .nav .col-xs-4  {
+    transition: all .5s
+} */
 .mobile {
     display: none;
 }
@@ -190,9 +234,12 @@ export default {
         
     }
 
-
-.search {
+.search > input{
+    transition: 0.8s;
 }
+    .search-disable {
+        opacity: .3;
+    }
     .search input{
         height: 40px;
         width: 100%;
@@ -229,6 +276,11 @@ export default {
   flex-direction: column;
   justify-content: center;
 }
+@media (max-width: 768px) {
+    .modal-dialog {
+        padding: 15%;
+    }
+}
 
 .modal.fade .modal-dialog {
   transform: translate(0, -100%);
@@ -237,6 +289,7 @@ export default {
 .modal.in .modal-dialog {
   transform: translate(0, 0);
 }
+    
 
 
 
@@ -253,7 +306,7 @@ export default {
         padding-left: 5px;
     }
 }
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .mobile {
         opacity: 1;
         display: block;
@@ -276,16 +329,10 @@ export default {
 
 
 /* Vue */
-.profile-fade-enter-active {
+.profile-fade-enter-active, .profile-fade-leave-active {
     transition: all 1s;
 }
-.profile-fade-leave-active {
-    transition: all 1s;
-}
-.profile-fade-enter, .profile-fade-leave-to
-/* .slide-fade-leave-active below version 2.1.8 */ {
-    width: 30px;
-    height: 30px;
+.profile-fade-enter, .profile-fade-leave-to {
     transform: translateX(5px);
     opacity: 0;
 }

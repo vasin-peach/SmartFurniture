@@ -4,17 +4,21 @@ import Router from 'vue-router'
 // Layout
 import Header from '@/components/Layout/Header'
 import Body from '@/components/Layout/Body'
-import Footer from '@/components/Layout/Footer'
+import Home from '@/components/Layout/Home'
 
 
 
 import About from '@/components/About'
 
-
 import Product from '@/components/Store/Product'
 import Cart from '@/components/Store/Cart'
 
+
+import Json from '@/components/Json'
+
 Vue.use(Router)
+
+
 
 export default new Router({
   mode: 'history',
@@ -24,16 +28,19 @@ export default new Router({
       components: {
         header: Header,
         body: Body,
-        footer: Footer,
       },
       children: [
         { path: '/', redirect: '/home'},
-        { path: '/home', component: Product, name: 'Home'},
+        { path: '/home', component: Home, name: 'Home'},
+        { path: '/product', component: Product, name: 'Product', meta: { requiresAuth: true }},
         { path: '/about', component: About, name: 'About'},
-        { path: '/cart', component: Cart, name: 'Cart'}
+        { path: '/cart', component: Cart, name: 'Cart', meta: { requiresAuth: true }},
+        { path: '/json', component: Json, name: 'Json', meta: { requiresAuth: true }},
       ]
     }
   ]
 })
+
+
 
 

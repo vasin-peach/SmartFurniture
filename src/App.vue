@@ -2,13 +2,14 @@
   <div id="app">
       <router-view name="header"/>
       <router-view name="body"/>
-      <router-view name="footer"/>
   </div>
 </template>
 
 <script>
+import firebase from 'firebase'
 export default {
   name: 'app',
+
 }
 </script>
 

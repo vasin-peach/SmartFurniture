@@ -1,6 +1,7 @@
 <template>
     <div>
-        Cart Page
+        <span>Cart Page</span>
+        <a href="/home" class="btn btn-success">Go</a>
     </div>
 </template>
 
