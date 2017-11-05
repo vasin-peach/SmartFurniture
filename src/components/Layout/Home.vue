@@ -145,7 +145,7 @@ export default {
         $('html, body').stop().animate({
           scrollTop: productId.offset().top - 80
         }, 500)
-      }, 1000)
+      }, 500)
 
 
       // $('.product .product-image').removeClass('col-sm-6')
@@ -162,16 +162,15 @@ export default {
 
 <style>
 .product {
-  transition: all 1s ease;
+  transition: all 0.5s ease;
   padding: 15px 25px;
 }
 .thumbnail {
   padding: 20px;
-  transition: all 0.5s ease;
 }
 .products > div {
   /* transition: width 0.5s ease, margin 0.5s ease, padding 0.5s ease; */
-  transition: all 0.5 ease;
+  transition: all 0.5s ease;
 }
 .product-loading-enter-active, .product-loading-leave-active {
     transition: all 0.5s;
