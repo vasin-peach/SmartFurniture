@@ -4,7 +4,6 @@
 // Default
 import Vue from 'vue'
 import VeeValidate from 'vee-validate'
-
 // Firebase
 import firebase from 'firebase'
 import firebaseui from 'firebaseui';

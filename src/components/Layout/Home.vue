@@ -56,8 +56,12 @@
 
           </div>
         </div>
+        <div class="body-footer" v-if="productLoad" style="padding: 10px 0px 30px">
+            <i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw"></i>
+        </div>
       </div>
     </transition>
+
 
     <!-- Loading Product -->
     <div class="body-loading" v-if="!products && auth">
@@ -82,8 +86,10 @@ export default {
 
       if (this_.products) {
         if($(window).scrollTop() == $(document).height() - $(window).height()) {
+
+          // loading animate
+          this_.productLoad = true
           // loading product random
-          
           firebase.database().ref('products/').on('value', function(snapshot) {
             var allIndex = []
             var randomData = []
@@ -96,9 +102,10 @@ export default {
               var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
               randomData.push(snapshot.val()[randomIndex])
             }
+            this_.productLoad = false
             this_.products = this_.products.concat(randomData)
-            console.log(this_.products)
           })
+          
         }
       }
 
@@ -167,6 +174,7 @@ export default {
       auth: false,
       user: null,
       products: null,
+      productLoad: false
     }
   },
   methods: {

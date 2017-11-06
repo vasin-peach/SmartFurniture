@@ -8,7 +8,7 @@
                 </div>
                 <div class="search navbar-left col col-xs-8 inner-addon left-addon">
                     <i class="fa fa-search" aria-hidden="true"></i>
-                    <input type="text" placeholder="Search">
+                    <input type="text" placeholder="Search"  @keyup="keyPress">
                 </div>
                 <ul class="nav navbar-nav navbar-right col col-xs-3 row">
 
@@ -81,6 +81,7 @@
             </div>
         </div>
 
+        <div v-for="search in searchList">{{search}}</div>
     </div>
 </template>
 
@@ -100,6 +101,7 @@ export default {
     //     next()
     // }
     created() {
+        const this_ = this
         firebase.auth().onAuthStateChanged(user => {
 
             var searchInput = $('.search > input')
@@ -125,9 +127,32 @@ export default {
 
             } else {
                 this.auth = false
+
+                // disable search input
                 searchInput.prop('disabled', true);
                 searchInput.addClass('search-disable');
             }
+
+            //create tags list for search
+            if (this.tags) {
+                firebase.database().ref('products/').once('value').then( function(snapshot) {
+                    for (var i in snapshot.val()) {
+                        firebase.database().ref('products/').child(i).child('tag').once('value').then( function(snapshot) {
+                            for (var x in snapshot.val()) {
+                                this_.tags = this_.tags.concat(snapshot.val()[x].toLowerCase())
+                            }
+                        })
+                        firebase.database().ref('products/').child(i).child('name').once('value').then( function(snapshot) {
+                            this_.tags.push(snapshot.val().toLowerCase())
+                            this_.tags = this_.tags.filter(function(elem, index, self) {
+                                return index == self.indexOf(elem);
+                            })
+                        })
+                    }
+                })
+            }
+
+
         });
     },
     data() {
@@ -137,6 +162,8 @@ export default {
             photoURL: null,
             user: null,
             auth: false,
+            tags: [],
+            searchList: [],
         }
     },
     components: {
@@ -156,6 +183,23 @@ export default {
                 const this_ = this
                 firebase.auth().signOut().then(function () {
                 }).catch (function(error) { console.log(error) })
+            }
+        },
+        keyPress() {
+            const this_ = this
+            var searchVal = $('.search input').val().toLowerCase()
+            var searchAll = this.tags
+            this_.searchList = []
+            if (searchVal) {
+            // Like
+                for (var i=0; i<searchAll.length; i++) {
+                    if(searchAll[i].substring(0, searchVal.length) === searchVal) {
+                        this_.searchList = this_.searchList.concat(searchAll[i].toLowerCase())
+                    }
+                }
+                this_.searchList = this_.searchList.slice(0, 12)
+            } else {
+                this_.searchList = []
             }
         }
     }
