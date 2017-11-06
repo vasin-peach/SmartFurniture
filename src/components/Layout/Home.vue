@@ -70,10 +70,39 @@
 </template>
 
 <script>
+
 import firebase from 'firebase'
 export default {
   name: 'Home',
   created() {
+    // scroll hit bottom
+    const this_ = this
+
+    $(window).scroll(function() {
+
+      if (this_.products) {
+        if($(window).scrollTop() == $(document).height() - $(window).height()) {
+          // loading product random
+          
+          firebase.database().ref('products/').on('value', function(snapshot) {
+            var allIndex = []
+            var randomData = []
+            var showData = []
+            var pickCount = 24
+            for(var i in snapshot.val()) {
+              allIndex.push(i)
+            }
+            for(var i=0; i<pickCount; i++) {
+              var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
+              randomData.push(snapshot.val()[randomIndex])
+            }
+            this_.products = this_.products.concat(randomData)
+            console.log(this_.products)
+          })
+        }
+      }
+
+    })
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
 
@@ -173,18 +202,12 @@ export default {
 
 
       // view product interested 
-
-      // create key for replace user
       var uid = this.auth.uid
       var db = firebase.database()
-      
       var dataRef = db.ref('users/').orderByChild('uid').equalTo(uid).once('value', function(snapshot) {
         for (var i in snapshot.val()) {
           var userKey = i
-          // var userData = snapshot.val()[i]
-          // var userTags = userData.tags
         }
-
         for (var x in getTag) {
           var cTag = getTag[x]
           var tagsRef = firebase.database().ref('users/').child(userKey).child('tags').child(cTag)
@@ -192,30 +215,8 @@ export default {
             return cTag + 1
           })
         }
-
-
-
-        // if (userTags) {
-        //    // if user have tags (old user)
-        //   var interestedTag = {}
-        //   for (var x in getTag) {
-        //     interestedTag[getTag[x]] = 1
-        //   }
-
-        // var tag1 = userTags
-        // var tag2 = interestedTag
-        // var sumVal = 0
-        // var sumTag = []
-
-
-
-        // console.log(sumTag)
-
-
-        // } else {
-        //   // if user not have tags (new user)
-        // }
       })
+
 
 
     }
