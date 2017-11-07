@@ -9,6 +9,13 @@
                 <div class="search navbar-left col col-xs-8 inner-addon left-addon">
                     <i class="fa fa-search" aria-hidden="true"></i>
                     <input type="text" placeholder="Search"  @keyup="keyPress">
+                    <div class="searchDrop" v-if="searchList.length > 0 && searchHide" @click="searchClose">
+                        <div v-for="search in searchList" class="search-group">
+                            <router-link :to="{ name: 'Search', params: {searchVal: search}}">
+                                <div class="search-item">{{search}}</div>
+                            </router-link>
+                        </div>
+                    </div>
                 </div>
                 <ul class="nav navbar-nav navbar-right col col-xs-3 row">
 
@@ -81,7 +88,9 @@
             </div>
         </div>
 
-        <div v-for="search in searchList">{{search}}</div>
+        <transition name="search-fade">
+            <div class="body-fade" v-if="searchList.length > 0 && searchHide" @click="searchClose"></div>
+        </transition>
     </div>
 </template>
 
@@ -102,15 +111,12 @@ export default {
     // }
     created() {
         const this_ = this
+
+        // Loader auth
         firebase.auth().onAuthStateChanged(user => {
 
-            var searchInput = $('.search > input')
-            var navBarTop = $('.navbar-right > li')
             if(user) {
                 this.auth = user
-                searchInput.prop('disabled', false);
-                searchInput.removeClass('search-disable');
-
                 // Add user to database
                 const pushData = {
                     'uid': this.auth.uid,
@@ -124,17 +130,12 @@ export default {
                         firebase.database().ref('users/').push(pushData)
                     }
                 })
-
             } else {
                 this.auth = false
-
-                // disable search input
-                searchInput.prop('disabled', true);
-                searchInput.addClass('search-disable');
             }
 
             //create tags list for search
-            if (this.tags) {
+            if (this.auth) {
                 firebase.database().ref('products/').once('value').then( function(snapshot) {
                     for (var i in snapshot.val()) {
                         firebase.database().ref('products/').child(i).child('tag').once('value').then( function(snapshot) {
@@ -152,6 +153,18 @@ export default {
                 })
             }
 
+            var searchInput = $('.search > input')
+            var navBarTop = $('.navbar-right > li')
+
+            if (this.auth) {
+                // enable search input
+                searchInput.prop('disabled', false);
+                searchInput.removeClass('search-disable');
+            } else {
+                // disable search input
+                searchInput.prop('disabled', true);
+                searchInput.addClass('search-disable');
+            } 
 
         });
     },
@@ -164,6 +177,7 @@ export default {
             auth: false,
             tags: [],
             searchList: [],
+            searchHide: false,
         }
     },
     components: {
@@ -189,6 +203,7 @@ export default {
             const this_ = this
             var searchVal = $('.search input').val().toLowerCase()
             var searchAll = this.tags
+            this_.searchHide = true
             this_.searchList = []
             if (searchVal) {
             // Like
@@ -201,7 +216,13 @@ export default {
             } else {
                 this_.searchList = []
             }
+        },
+        searchClose() {
+            const this_ = this
+            this_.searchHide = false
+            $('.search > input').val('')
         }
+
     }
 }
 
@@ -278,6 +299,11 @@ export default {
         
     }
 
+
+.search {
+    padding-left: 0;
+    padding-right: 0;
+}
 .search > input{
     transition: 0.8s;
 }
@@ -287,8 +313,6 @@ export default {
     .search input{
         height: 40px;
         width: 100%;
-        padding: 10px;
-        padding-left: 50px;
         border: none;
         border-radius: 5px;
         background: #ccc;
@@ -333,6 +357,40 @@ export default {
 .modal.in .modal-dialog {
   transform: translate(0, 0);
 }
+
+
+.searchDrop {
+    position: absolute;
+    padding: 10px 0;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    width: 100%;
+    text-align: left;
+}
+    .search-group a {
+        text-decoration: none;
+        color: #777;
+    }
+    .search-item {
+        padding: 0 10px 10px 10px;
+    }
+        .search-item:hover {
+            background: #ccc;
+            text-decoration: none;
+        }
+    .body-fade {
+    position: fixed;
+    top:0; bottom:0;
+    left:0; right:0;
+    background: #000;
+    opacity: .5;
+    z-index: 1;
+    }
+    @media (max-width: 767px) {
+        .searchDrop {
+            width: 90%;
+        }
+    }
     
 
 
@@ -376,8 +434,15 @@ export default {
 .profile-fade-enter-active, .profile-fade-leave-active {
     transition: all 1s;
 }
-.profile-fade-enter, .profile-fade-leave-to {
+.profile-fade-enter, .profile-fade-leave-to{
     transform: translateX(5px);
     opacity: 0;
 }
+.search-fade-enter-active, .search-fade-leave-active {
+    transition: opacity 0.3s;
+}
+.search-fade-enter, .search-fade-leave-to {
+    opacity: 0;
+}
+
 </style>

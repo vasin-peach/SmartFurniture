@@ -34,7 +34,8 @@
                           <!-- Tag -->
                           <div>
                             <div v-for="tag in product.tag" style="float:left; margin: 2px">
-                              <router-link :to="{ name: 'Search', params: {tag: tag}}" class="label label-info">{{tag}}</router-link>
+                              <router-link :to="{ name: 'Search', params: {searchVal: tag}}" class="label label-info">{{tag}}</router-link>
+                              
                             </div>
                           </div>
                           <div class="clear:both"></div><br><hr>
@@ -81,35 +82,41 @@ export default {
   created() {
     // scroll hit bottom
     const this_ = this
+    
 
-    $(window).scroll(function() {
+      $(window).scroll(function() {
 
-      if (this_.products) {
-        if($(window).scrollTop() == $(document).height() - $(window).height()) {
-
-          // loading animate
-          this_.productLoad = true
-          // loading product random
-          firebase.database().ref('products/').on('value', function(snapshot) {
-            var allIndex = []
-            var randomData = []
-            var showData = []
-            var pickCount = 24
-            for(var i in snapshot.val()) {
-              allIndex.push(i)
+        if (this_.products) {
+          if($(window).scrollTop() == $(document).height() - $(window).height()) {
+            if (window.location.pathname == '/home') {
+              // loading animate
+              this_.productLoad = true
+              // loading product random
+              firebase.database().ref('products/').on('value', function(snapshot) {
+                var allIndex = []
+                var randomData = []
+                var showData = []
+                var pickCount = 24
+                for(var i in snapshot.val()) {
+                  allIndex.push(i)
+                }
+                for(var i=0; i<pickCount; i++) {
+                  var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
+                  randomData.push(snapshot.val()[randomIndex])
+                }
+                this_.productLoad = false
+                this_.products = this_.products.concat(randomData)
+              }, function(error) {
+                console.log(error)
+              })
             }
-            for(var i=0; i<pickCount; i++) {
-              var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
-              randomData.push(snapshot.val()[randomIndex])
-            }
-            this_.productLoad = false
-            this_.products = this_.products.concat(randomData)
-          })
-          
+
+            
+          }
         }
-      }
 
-    })
+      })
+
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
 
@@ -124,7 +131,7 @@ export default {
 
           //New User
           if (!this_.user.tags) { 
-            console.log('[LOAD] New User.')
+            console.log('[LOAD] new User.')
             // Read random
             firebase.database().ref('products/').on('value', function(snapshot) {
               var allIndex = []
@@ -144,7 +151,7 @@ export default {
 
           //Old User
           } else { 
-            console.log('[LOAD] Old User.')
+            console.log('[LOAD] old User.')
             // Read random
             firebase.database().ref('products/').on('value', function(snapshot) {
               var allIndex = []
@@ -174,7 +181,8 @@ export default {
       auth: false,
       user: null,
       products: null,
-      productLoad: false
+      productLoad: false,
+      currentRoute: this.$route.name
     }
   },
   methods: {
@@ -224,8 +232,6 @@ export default {
           })
         }
       })
-
-
 
     }
   }
