@@ -3,12 +3,12 @@
     <!-- Body Container -->
     <div class="container-fluid body">
       <transition name="body-fade">
-        <div v-if="!auth">
+        <div v-if="!Auth">
           <div @click="plsLogin()" class="body-fade"></div>
         </div>
       </transition>
       <transition :name="transitionName" mode="out-in">
-        <router-view class="body-container"></router-view>
+        <router-view :Auth="Auth" :Products="Products" class="body-container"></router-view>
       </transition>
     </div>
 
@@ -32,23 +32,16 @@
 import firebase from 'firebase'
 export default {
   name: 'Body',
+  props: ['Auth', 'Products'],
   created() {
-    firebase.auth().onAuthStateChanged(user => { // Check Login?
-      if(user) { // User Login
-        this.auth = user
-      } else { // User Logout
-        this.auth = false
-      }
-    });
   },
   data() {
     return {
       transitionName: 'slide-left',
-      auth: null,
     }
   },
   beforeRouteUpdate(to, from, next) { // Provider
-    if (this.auth) {
+    if (this.Auth) {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
@@ -61,7 +54,7 @@ export default {
     plsLogin() {
       $('#popup-please-login').modal('show')
     }
-  }
+  },
 }
 </script>
 

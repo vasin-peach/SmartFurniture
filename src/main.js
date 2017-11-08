@@ -9,10 +9,10 @@ import firebase from 'firebase'
 import firebaseui from 'firebaseui';
 import { firebaseConfig } from './config'
 
-
-
 import App from './App'
 import router from './router'
+
+
 
 // Login Provider
 router.beforeEach((to, from, next) => {
@@ -32,6 +32,7 @@ router.beforeEach((to, from, next) => {
   }
 })
 
+
 // Vue setup
 Vue.config.productionTip = false
 Vue.use(firebase)
@@ -49,6 +50,11 @@ new Vue({
     root: '/root',
     headers: {
       Authorization: 'Basic YXBpOnBhc3N3b3Jk'
+    }
+  },
+  data() {
+    return {
+      auth: null
     }
   }
 })

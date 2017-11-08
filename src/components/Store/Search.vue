@@ -1,7 +1,11 @@
 <template>
   <div>
     <transition name="product-loading">
-      <div class="row products" v-if="auth && products">
+      
+      <div class="row products" v-if="Auth && products">
+        <div v-if="products.length < 1" class="well">
+          <h2>Server overload Please try again.</h2>
+        </div>
         <div v-for="product in products">
           <div :id='product.article' class="col col-xs-6 col-sm-4 col-md-3 product" @click="viewProduct(product.article, product.tag)">
             <!-- Thumbnail -->
@@ -71,81 +75,121 @@
 import firebase from 'firebase'
 export default {
     name: 'Search',
+    beforeRouteUpdate (to, from, next) {
+      var path = to.path.split('/')
+      this.path = path[path.length-1]
+      this.products = []
+      this.fetchData()
+    },
     created() {
         const this_ = this
         var ref = firebase.database().ref('products/')
-        var currentSearch = this.$route.params.searchVal
-        var count = 0
-        firebase.auth().onAuthStateChanged(user => { if (user) { this.auth = user } else { this.auth = false } });
-        if (currentSearch && !this_.products) {
-            ref.orderByChild('name').equalTo(currentSearch.toUpperCase()).once('value', function(snapshot) {
-              this_.products = snapshot.val()
-              while (!this_.products) {
-                ref.orderByChild('tag/' + count).equalTo(currentSearch).once('value', function(snapshot) {
-                    this_.products = snapshot.val()
-                }, function(error) {
-                  console.log(error, 'error inside')
-                })
-                count ++
-                if (count > 10) { console.log('Search Not Found'); break }
-              }
-            }, function(error) {
-              console.log(error, 'error outside')
-            })
-        } else {
-          console.log('Search Not Found Somthing')
-          router.push('Home')
-        }
-        
+        // var currentSearch = this.$route.params.searchVal
+        // var count = 0
+        // firebase.auth().onAuthStateChanged(user => { if (user) { this.auth = user } else { this.auth = false } });
+        // if (currentSearch && !this_.products) {
+        //     ref.orderByChild('name').equalTo(currentSearch.toUpperCase()).once('value', function(snapshot) {
+        //       this_.products = snapshot.val()
+        //       while (!this_.products) {
+        //         ref.orderByChild('tag/' + count).equalTo(currentSearch).once('value', function(snapshot) {
+        //             this_.products = snapshot.val()
+        //         }, function(error) {
+        //           console.log(error, 'error inside')
+        //         })
+        //         count ++
+        //         if (count > 10) { console.log('Search Not Found'); break }
+        //       }
+        //     }, function(error) {
+        //       console.log(error, 'error outside')
+        //     })
+        // } else {
+        //   console.log('Search Not Found Somthing')
+        //   router.push('Home')
+        // }
 
+        // var currentSearch = window.location.pathname.split('/')
+        // currentSearch = currentSearch[currentSearch.length-1]
+        // var currentSearch = this.path
+
+        // for(var i in this_.Products) {
+        //   var currentTag = this_.Products[i].tag
+        //   var currentName = this_.Products[i].name
+          
+        //   if (currentTag.indexOf(currentSearch) > 0 || currentName == currentSearch.toUpperCase()) {
+        //     this_.products = this_.products.concat(this_.Products[i])
+        //   }
+        // }
+
+        this.fetchData()
+        
     },
-    props: ['searchVal'],
+    props: ['Auth', 'Products'],
     data() {
       return {
         auth: null,
-        products: null,
+        products: [],
         loading: false,
         post: null,
-        error: null
+        error: null,
+        path: this.$route.params.searchVal
       }
     },
     methods: {
-      fetchData: function(searchVal) {
-        console.log('hi')
+      fetchData: function() {
+        const this_ = this
+        var currentSearch = this.path
+
+        for(var i in this_.Products) {
+          var currentTag = this_.Products[i].tag
+          var currentName = this_.Products[i].name
+          
+          if (currentTag.indexOf(currentSearch) > 0 || currentName == currentSearch.toUpperCase()) {
+            this_.products = this_.products.concat(this_.Products[i])
+          }
+        }
       },
       viewProduct: function(article, getTag) {
 
-        // Product Layout
-        var productId = $('#' + article)
-        var productImg = $('#' + article + ' .product-image')
-        var productCaption = $('#' + article + ' .product-caption')
-        var productHide = $('#' + article + ' .product-hide')
+          // Product Layout
+          var productId = $('#' + article)
+          var productImg = $('#' + article + ' .product-image')
+          var productCaption = $('#' + article + ' .product-caption')
+          var productHide = $('#' + article + ' .product-hide')
 
-        $('.product').removeClass('col-xs-12 col-sm-12 col-md-12')
-        $('.product').addClass('col-xs-6 col-sm-4 col-md-3')
-        $('.product img').css('width', '90%')
-        $('.product .detail').css('display', 'none')
-        $('.product-image, .product-caption').removeClass('col-sm-6')
-        $('.product-hide').css('display', 'none')
+          $('.product').removeClass('col-xs-12 col-sm-12 col-md-12')
+          $('.product').addClass('col-xs-6 col-sm-4 col-md-3')
+          $('.product img').css('width', '90%')
+          $('.product .detail').css('display', 'none')
+          $('.product-image, .product-caption').removeClass('col-sm-6')
+          $('.product-hide').css('display', 'none')
 
-        productId.toggleClass('col-xs-6 col-sm-4 col-md-3')
-        productId.toggleClass('col-xs-12 col-sm-12 col-md-12')
-        // productId.addClass('col-xs-12 col-sm-8 col-md-9 ')
-        productId.addClass('col-xs-12 col-sm-12 col-md-12 ')
-        $('#' + article + ' .detail').css('display', 'block')
-        setTimeout(function() {
-          $('html, body').stop().animate({
-            scrollTop: productId.offset().top - 80
+          productId.toggleClass('col-xs-6 col-sm-4 col-md-3')
+          productId.toggleClass('col-xs-12 col-sm-12 col-md-12')
+          // productId.addClass('col-xs-12 col-sm-8 col-md-9 ')
+          productId.addClass('col-xs-12 col-sm-12 col-md-12 ')
+          $('#' + article + ' .detail').css('display', 'block')
+
+          const this_ = this
+          setTimeout(function() {
+            try {
+              $('html, body').stop().animate({
+                scrollTop: productId.offset().top - 80
+              }, 400)
+            } catch (e) {
+              location.reload()
+              console.log('OVERLOAD' + e)
+              
+            }
           }, 400)
-        }, 400)
-        
-        productImg.addClass('col-sm-6')
-        productCaption.addClass('col-sm-6')
-        productHide.css('display', 'block')
+
+          productImg.addClass('col-sm-6')
+          productCaption.addClass('col-sm-6')
+          productHide.css('display', 'block')
+
 
 
         // view product interested 
-        var uid = this.auth.uid
+        var uid = this.Auth.uid
         var db = firebase.database()
         var dataRef = db.ref('users/').orderByChild('uid').equalTo(uid).once('value', function(snapshot) {
           for (var i in snapshot.val()) {

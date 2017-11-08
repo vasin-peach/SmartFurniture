@@ -35,9 +35,9 @@ export default new Router({
         { path: '/home', component: Home, name: 'Home'},
         { path: '/product', component: Product, name: 'Product', meta: { requiresAuth: true }},
         { path: '/about', component: About, name: 'About'},
-        { path: '/cart', component: Cart, name: 'Cart', meta: { requiresAuth: true }},
+        { path: '/cart/:article', component: Cart, name: 'Cart', meta: { requiresAuth: true }},
         { path: '/json', component: Json, name: 'Json', meta: { requiresAuth: true }},
-        { path: '/search/:searchVal', component: Search, name: 'Search', meta: { requiresAuth: true}}
+        { path: '/search/:searchVal', component: Search, name: 'Search', meta: { requiresAuth: true}},
       ]
     }
   ]

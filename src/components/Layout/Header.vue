@@ -8,7 +8,7 @@
                 </div>
                 <div class="search navbar-left col col-xs-8 inner-addon left-addon">
                     <i class="fa fa-search" aria-hidden="true"></i>
-                    <input type="text" placeholder="Search"  @keyup="keyPress">
+                    <input type="text" placeholder="Search" v-model="searchVal" @keyup="searchActive">
                     <div class="searchDrop" v-if="searchList.length > 0 && searchHide" @click="searchClose">
                         <div v-for="search in searchList" class="search-group">
                             <router-link :to="{ name: 'Search', params: {searchVal: search}}">
@@ -22,17 +22,17 @@
                     <li class="col col-xs-3 dropdown" style="cursor:pointer">
                         <a class="dropdown-toggle" data-toggle="dropdown" style="font-size: 22px;"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
-                            <li v-if="!auth">
+                            <li v-if="!Auth">
                                 <a href="#" id="login" @click="login()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign In</span></a>
                             </li>
-                            <li v-if="auth">
+                            <li v-if="Auth">
                                 <a href="#" id="login" @click="logout()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign Out</span></a>
                             </li>
                         </ul>
                     </li>
                     <transition name="profile-fade">
-                        <li class="col col-xs-3 profile-img" v-if="auth">
-                            <router-link :to="{ name: 'Home' }" id="home"><img :src="auth.photoURL"></router-link>
+                        <li class="col col-xs-3 profile-img" v-if="Auth">
+                            <router-link :to="{ name: 'Home' }" id="home"><img :src="Auth.photoURL"></router-link>
                         </li>
                     </transition>
                     <li class="col col-xs-3 ">
@@ -55,8 +55,8 @@
                         <router-link :to="{ name: 'Cart' }" id="cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></router-link>
                     </li>
                     <transition name="profile-fade">
-                        <li class="col col-xs-3 profile-img" v-if="auth">
-                            <router-link :to="{ name: 'Home' }" id="home"><img :src="auth.photoURL"></router-link>
+                        <li class="col col-xs-3 profile-img" v-if="Auth">
+                            <router-link :to="{ name: 'Home' }" id="home"><img :src="Auth.photoURL"></router-link>
                         </li>
                     </transition>
                     <li class="col col-xs-3">
@@ -74,10 +74,10 @@
                         <h4 class="modal-title">Menu</h4>
                     </div>
                     <div class="modal-body">
-                        <div v-if="!auth">
+                        <div v-if="!Auth">
                             <a href="#" id="login" @click="login()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign In</span></a>
                         </div>
-                        <div v-if="auth">
+                        <div v-if="Auth">
                             <a href="#" id="login" @click="logout()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign Out</span></a>
                         </div>
                     </div>
@@ -99,9 +99,24 @@ import firebase from 'firebase'
 
 
 
-
 export default {
     name: 'Header',
+    props: ['Auth', 'Products'],
+    data() {
+        return {
+            popupList: ['other'],
+            displayName: null,
+            photoURL: null,
+            user: null,
+
+            searchAll: [],
+            searchVal: null,
+
+            searchList: [],
+            searchHide: false,
+            
+        }
+    },
     // beforeRouteUpdate(to, from, next) { // Navbar active animation
     //     var navCurrent = $('#' + from.path.split('/')[1].toLowerCase())
     //     var navNext = $('#' + to.path.split('/')[1].toLowerCase())
@@ -112,80 +127,46 @@ export default {
     created() {
         const this_ = this
 
-        // Loader auth
-        firebase.auth().onAuthStateChanged(user => {
+        // Check login
+            if (this.Auth) {
+                // Enable search input
+                $('.search > input').prop('disabled', false);
+                $('.search > input').removeClass('search-disable');
 
-            if(user) {
-                this.auth = user
-                // Add user to database
+                // Create data from fb and push to firebase
                 const pushData = {
-                    'uid': this.auth.uid,
-                    'name': this.auth.displayName,
-                    'email': this.auth.email,
-                    'phone': this.auth.phoneNumber
+                    'uid': this.Auth.uid,
+                    'name': this.Auth.displayName,
+                    'email': this.Auth.email,
+                    'phone': this.Auth.phoneNumber
                 }
-                firebase.database().ref('users/').orderByChild('uid').equalTo(this.auth.uid).once('value').then( function(snapshot) {
+                firebase.database().ref('users/').orderByChild('uid').equalTo(this.Auth.uid).once('value').then( function(snapshot) {
                     // Check is exist
                     if (!snapshot.val()) {
                         firebase.database().ref('users/').push(pushData)
                     }
                 })
-            } else {
-                this.auth = false
-            }
 
-            //create tags list for search
-            if (this.auth) {
-                firebase.database().ref('products/').once('value').then( function(snapshot) {
-                    for (var i in snapshot.val()) {
-                        firebase.database().ref('products/').child(i).child('tag').once('value').then( function(snapshot) {
-                            for (var x in snapshot.val()) {
-                                this_.tags = this_.tags.concat(snapshot.val()[x].toLowerCase())
-                            }
-                        })
-                        firebase.database().ref('products/').child(i).child('name').once('value').then( function(snapshot) {
-                            this_.tags.push(snapshot.val().toLowerCase())
-                            this_.tags = this_.tags.filter(function(elem, index, self) {
-                                return index == self.indexOf(elem);
-                            })
+                // Create tags for search list
+                    for (var i in this_.Products) {
+                        this.searchAll = this.searchAll.concat(this.Products[i].tag)
+                        this.searchAll.push(this.Products[i].name)
+                        this.searchAll = this.searchAll.filter(function(elem, index, self) {
+                            return index == self.indexOf(elem);
                         })
                     }
-                })
-            }
 
-            var searchInput = $('.search > input')
-            var navBarTop = $('.navbar-right > li')
-
-            if (this.auth) {
-                // enable search input
-                searchInput.prop('disabled', false);
-                searchInput.removeClass('search-disable');
             } else {
                 // disable search input
-                searchInput.prop('disabled', true);
-                searchInput.addClass('search-disable');
-            } 
+                $('.search > input').prop('disabled', true);
+                $('.search > input').addClass('search-disable');
+            }
 
-        });
-    },
-    data() {
-        return {
-            popupList: ['other'],
-            displayName: null,
-            photoURL: null,
-            user: null,
-            auth: false,
-            tags: [],
-            searchList: [],
-            searchHide: false,
-        }
-    },
-    components: {
+        
     },
     methods: {
         login() {
-            const this_ = this
-            if (!this.auth) {
+            if (!this.Auth) {
                 firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).then( function() {
                     const provider = new firebase.auth.FacebookAuthProvider()
                     return firebase.auth().signInWithPopup(provider)
@@ -193,36 +174,37 @@ export default {
             }
         },
         logout() {
-            if (this.auth) {
-                const this_ = this
+            if (this.Auth) {
                 firebase.auth().signOut().then(function () {
                 }).catch (function(error) { console.log(error) })
-            }
-        },
-        keyPress() {
-            const this_ = this
-            var searchVal = $('.search input').val().toLowerCase()
-            var searchAll = this.tags
-            this_.searchHide = true
-            this_.searchList = []
-            if (searchVal) {
-            // Like
-                for (var i=0; i<searchAll.length; i++) {
-                    if(searchAll[i].substring(0, searchVal.length) === searchVal) {
-                        this_.searchList = this_.searchList.concat(searchAll[i].toLowerCase())
-                    }
-                }
-                this_.searchList = this_.searchList.slice(0, 12)
-            } else {
-                this_.searchList = []
             }
         },
         searchClose() {
             const this_ = this
             this_.searchHide = false
             $('.search > input').val('')
+        },
+        searchActive() {
+            if (this.Auth) {
+            const this_ = this
+            var searchVal = this.searchVal
+            const searchAll = this.searchAll
+            this_.searchHide = true
+            this_.searchList = []
+                if (this.searchVal) {
+                // Like
+                    for (var i=0; i<searchAll.length; i++) {
+                        if(searchAll[i].substring(0, searchVal.length) === searchVal) {
+                            this_.searchList = this_.searchList.concat(searchAll[i].toLowerCase())
+                        }
+                    }
+                    this_.searchList = this_.searchList.slice(0, 12)
+                } else {
+                    this_.searchList = []
+                }
+            }
         }
-
+        
     }
 }
 
