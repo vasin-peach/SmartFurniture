@@ -47,7 +47,8 @@
                         <strong class="text-left">{{ product.price }}<b style="color:green">฿</b></strong>
                         <hr>
                         <!-- Buy Button -->
-                        <button class="btn btn-success"><i class="fa fa-shopping-cart" aria-hidden="true"> Buy</i></button>
+                        <!-- <button class="btn btn-success"><i class="fa fa-shopping-cart" aria-hidden="true"> Buy</i></button> -->
+                        <router-link :to="{ name: 'Cart', params: {article: product.article}}" class="btn btn-success"><i class="fa fa-shopping-cart" aria-hidden="true"> Buy</i></router-link>
                       </div>
 
                   </div>
