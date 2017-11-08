@@ -1,14 +1,17 @@
 <template>
     <div class="panel panel-default" v-if="products">
         <div class="panel-heading">
-            <strong>{{ products.name }}</strong>
+            Buy Product
         </div>
         <div class="panel-body" style="padding: 10px;">
             <div class="row">
                 <div class="col col-sm-5">
                     <img :src="products.image" style="width: 100%;">
                 </div>
-                <div class="col col-sm-7">
+                <div class="col col-sm-7"  style="padding-bottom: 30px;">
+                    <br>
+                    <strong>{{ products.name }}</strong>
+                    <hr>
                     <div class="row well" style="width: 100%;">
                         <p>{{ products.detail }}</p>
                     </div>
@@ -23,9 +26,11 @@
                         <h2><strong class="text-left">{{ products.price }}<b style="color:green">฿</b></strong></h2>
                     </div>
                     <hr>
-                    <button class="btn btn-success" @click="buyProduct()"><i class="fa fa-shopping-cart" aria-hidden="true"> Buy</i></button>
+                    <button class="btn btn-success btn-lg" @click="buyProduct()"><i class="fa fa-shopping-cart" aria-hidden="true"> Buy</i></button>
                 </div>
             </div>
+        </div>
+        <div class="panel-footer">
         </div>
     </div>
 </template>
@@ -54,7 +59,7 @@ export default {
         // var db = firebase.database().ref('products/')
         // db.orderByChild('article').equalTo(this_.article).once('value', function(snapshot) {
         //     for (var i in snapshot.val()) {
-        //         this_.product = snapshot.val()[i]
+        //         this_.prodct = snapshot.val()[i]
         //     }
         //     this_.buyItem()
         // })
@@ -70,10 +75,28 @@ export default {
                 productName: this.products.name,
                 createdAt: firebase.database.ServerValue.TIMESTAMP
             }
+            // buy product interested 
+            var uid = this.Auth.uid
+            var db = firebase.database()
+            var dataRef = db.ref('users/').orderByChild('uid').equalTo(uid).once('value', function(snapshot) {
+                for (var i in snapshot.val()) {
+                var userKey = i
+                }
+                for (var x in getTag) {
+                var cTag = getTag[x]
+                var tagsRef = firebase.database().ref('users/').child(userKey).child('tags').child(cTag)
+                tagsRef.transaction(function(cTag) {
+                    return cTag + 30
+                })
+                }
+            })
+
+
             firebase.database().ref('history/').push(dataSet).then(function() {
                 alert('สั่งซื้อสินค้าเสร็จสิ้น')
                 this_.$router.replace({ name: 'Home' })
             }) 
+            
         }
     }
 }

@@ -1,12 +1,20 @@
 <template>
   <transition name="body-fade">
-    <div id="app" v-if="auth && products">
-      <router-view :Auth="auth" :Products="products" name="header"></router-view>
-      <router-view :Auth="auth" :Products="products" name="body"></router-view>
+    <div id="app" class="app">
+      <div v-if="">
+        <router-view name="header"></router-view>
+        <router-view :Auth="auth" :Products="products" name="body"></router-view>
+      </div>
+      <!-- <div v-if="auth && !products" class="body2-loading">
+          <i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw" v-if="!products || auth"></i>
+      </div>
+      <div v-if="!auth && !products" class="body-2-load">
+        <div class="signin">
+          <button class="btn btn-primary btn-lg" @click="login()">Signin with Facebook</button>
+        </div>
+      </div> -->
     </div>
-    <div v-else  class="body2-loading">
-        <i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw" v-if="!products || auth"></i>
-    </div>
+
   </transition>
 </template>
 
@@ -17,7 +25,8 @@ export default {
   data() {
     return {
       auth: null,
-      products: null
+      products: null,
+      searchAll: []
     }
   },
   created() {
@@ -35,6 +44,16 @@ export default {
       }
     })
   },
+  // methods: {
+  //       login() {
+  //           if (!this.Auth) {
+  //               firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).then( function() {
+  //                   const provider = new firebase.auth.FacebookAuthProvider()
+  //                   return firebase.auth().signInWithPopup(provider)
+  //               }).catch(function(error) { console.log(error) })
+  //           }
+  //       },
+  // }
 
 }
 </script>
@@ -47,24 +66,30 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  /* background-image: url('assets/loading-bg.jpg'); */
+  border-radius: 10px;
 }
 .body-else {
   position: relative;
   left: 50%;
 }
 .body2-loading {
-  width: 100%;
-  height: 100%;
   position: fixed;
   top:0; bottom:0;
   right:0; left:0;
+  overflow: hidden;
 }
-  .body2-loading i {
+  .body2-loading i{
     position: relative;
-    top: 45%;
-    left: 45%;
-    transform: translateY(-55%);
-    transform: translateY(-55%);
+    top: 42%;
+    transform: translate(-50%, -50%)
+   
+  }
+  .signin {
+    position: absolute;
+    top: 42%;
+    left: 42%;
+    transform: translate(-50%, -50%)
   }
 
 </style>

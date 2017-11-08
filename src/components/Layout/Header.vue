@@ -19,26 +19,26 @@
                 </div>
                 <ul class="nav navbar-nav navbar-right col col-xs-3 row">
 
-                    <li class="col col-xs-3 dropdown" style="cursor:pointer">
+                    <li class="col col-xs-4 dropdown" style="cursor:pointer">
                         <a class="dropdown-toggle" data-toggle="dropdown" style="font-size: 22px;"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
-                            <li v-if="!Auth">
+                            <li v-if="!auth">
                                 <a href="#" id="login" @click="login()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign In</span></a>
                             </li>
-                            <li v-if="Auth">
+                            <li v-if="auth">
                                 <a href="#" id="login" @click="logout()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign Out</span></a>
                             </li>
                         </ul>
                     </li>
                     <transition name="profile-fade">
-                        <li class="col col-xs-3 profile-img" v-if="Auth">
-                            <router-link :to="{ name: 'Home' }" id="home"><img :src="Auth.photoURL"></router-link>
+                        <li class="col col-xs-4 profile-img" v-if="auth">
+                            <router-link :to="{ name: 'Home' }" id="home"><img :src="auth.photoURL"></router-link>
                         </li>
                     </transition>
-                    <li class="col col-xs-3 ">
+                    <!-- <li class="col col-xs-3 ">
                         <router-link :to="{ name: 'Cart' }" id="cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>Cart</span></router-link>
-                    </li>
-                    <li class="col col-xs-3">
+                    </li> -->
+                    <li class="col col-xs-4">
                         <router-link :to="{ name: 'Home' }" id="home"><i class="fa fa-home" aria-hidden="true" title="Home"></i> <span>Home</span></router-link>
                     </li>
                 </ul>
@@ -51,12 +51,12 @@
                     <li class="col col-xs-3" data-toggle="modal" data-target="#popup-other">
                         <a href="#" id="other"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
                     </li>
-                    <li class="col col-xs-3">
-                        <router-link :to="{ name: 'Cart' }" id="cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></router-link>
-                    </li>
+                    <!-- <li class="col col-xs-3">
+                        <router-link :to="{ name: 'Cart', params: product.article }" id="cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></router-link>
+                    </li> -->
                     <transition name="profile-fade">
-                        <li class="col col-xs-3 profile-img" v-if="Auth">
-                            <router-link :to="{ name: 'Home' }" id="home"><img :src="Auth.photoURL"></router-link>
+                        <li class="col col-xs-3 profile-img" v-if="auth">
+                            <router-link :to="{ name: 'Home' }" id="home"><img :src="auth.photoURL"></router-link>
                         </li>
                     </transition>
                     <li class="col col-xs-3">
@@ -74,10 +74,10 @@
                         <h4 class="modal-title">Menu</h4>
                     </div>
                     <div class="modal-body">
-                        <div v-if="!Auth">
+                        <div v-if="!auth">
                             <a href="#" id="login" @click="login()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign In</span></a>
                         </div>
-                        <div v-if="Auth">
+                        <div v-if="auth">
                             <a href="#" id="login" @click="logout()"><i class="fa fa-sign-in" aria-hidden="true" title="Sign In"></i><span> Sign Out</span></a>
                         </div>
                     </div>
@@ -101,19 +101,19 @@ import firebase from 'firebase'
 
 export default {
     name: 'Header',
-    props: ['Auth', 'Products'],
     data() {
         return {
             popupList: ['other'],
             displayName: null,
             photoURL: null,
             user: null,
-
-            searchAll: [],
             searchVal: null,
-
             searchList: [],
+            searchAll: [],
             searchHide: false,
+
+            auth: null,
+            products: null
             
         }
     },
@@ -125,48 +125,64 @@ export default {
     //     next()
     // }
     created() {
+        // default this
         const this_ = this
+        // Passdata to other component when login
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                // return user
+                this.auth = user
+                // return product
+                firebase.database().ref('products/').once('value').then( function(snapshot) {
+                    this_.products = snapshot.val()
+                    var products = snapshot.val()
+                    var searchAll = []
+                    // Create tags for search list
+                    for (var i in products) {
+                        searchAll = searchAll.concat(products[i].tag)
+                        searchAll.push(products[i].name)
+                        searchAll = searchAll.filter(function(elem, index, self) {
+                            return index == self.indexOf(elem);
+                        })
+                        this_.searchAll = searchAll
+                    }
+                })
 
-        // Check login
-            if (this.Auth) {
                 // Enable search input
                 $('.search > input').prop('disabled', false);
                 $('.search > input').removeClass('search-disable');
 
+
+
+
                 // Create data from fb and push to firebase
                 const pushData = {
-                    'uid': this.Auth.uid,
-                    'name': this.Auth.displayName,
-                    'email': this.Auth.email,
-                    'phone': this.Auth.phoneNumber
+                    'uid': this.auth.uid,
+                    'name': this.auth.displayName,
+                    'email': this.auth.email,
+                    'phone': this.auth.phoneNumber
                 }
-                firebase.database().ref('users/').orderByChild('uid').equalTo(this.Auth.uid).once('value').then( function(snapshot) {
+                firebase.database().ref('users/').orderByChild('uid').equalTo(this.auth.uid).once('value').then( function(snapshot) {
                     // Check is exist
                     if (!snapshot.val()) {
                         firebase.database().ref('users/').push(pushData)
                     }
                 })
 
-                // Create tags for search list
-                    for (var i in this_.Products) {
-                        this.searchAll = this.searchAll.concat(this.Products[i].tag)
-                        this.searchAll.push(this.Products[i].name)
-                        this.searchAll = this.searchAll.filter(function(elem, index, self) {
-                            return index == self.indexOf(elem);
-                        })
-                    }
+
+
 
             } else {
+                this.auth = false
                 // disable search input
                 $('.search > input').prop('disabled', true);
                 $('.search > input').addClass('search-disable');
             }
-
-        
+        })
     },
     methods: {
         login() {
-            if (!this.Auth) {
+            if (!this.auth) {
                 firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).then( function() {
                     const provider = new firebase.auth.FacebookAuthProvider()
                     return firebase.auth().signInWithPopup(provider)
@@ -174,9 +190,10 @@ export default {
             }
         },
         logout() {
-            if (this.Auth) {
+            if (this.auth) {
                 firebase.auth().signOut().then(function () {
                 }).catch (function(error) { console.log(error) })
+                this.auth = null
             }
         },
         searchClose() {
@@ -185,7 +202,7 @@ export default {
             $('.search > input').val('')
         },
         searchActive() {
-            if (this.Auth) {
+            if (this.auth) {
             const this_ = this
             var searchVal = this.searchVal
             const searchAll = this.searchAll

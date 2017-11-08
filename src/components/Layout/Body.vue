@@ -3,27 +3,18 @@
     <!-- Body Container -->
     <div class="container-fluid body">
       <transition name="body-fade">
-        <div v-if="!Auth">
-          <div @click="plsLogin()" class="body-fade"></div>
+        <div>
+          <div v-if="!auth">
+            <div>
+              <button class="btn btn-primary btn-lg sign-in" @click="login()">Signin With Facebook</button>
+            </div>
+          </div>
         </div>
       </transition>
       <transition :name="transitionName" mode="out-in">
-        <router-view :Auth="Auth" :Products="Products" class="body-container"></router-view>
+        <router-view :Auth="auth" :Products="Products" class="body-container"></router-view>
       </transition>
     </div>
-
-    <!-- Modal Please login -->
-    <div class="modal fade" id="popup-please-login" role="dialog">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content" style="box-shadow: 0 1px 5px 1px;">
-          <div class="modal-header" style="border-radius: 5px;">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <span class="modal-title">You must be logged in.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
 
   </div>
 </template>
@@ -32,28 +23,55 @@
 import firebase from 'firebase'
 export default {
   name: 'Body',
-  props: ['Auth', 'Products'],
-  created() {
-  },
+    props: ['Products'],
+    created() {
+        // default this
+        const this_ = this
+        // Passdata to other component when login
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                // return user
+                this.auth = user
+                // // return product
+                // firebase.database().ref('products/').once('value').then( function(snapshot) {
+                //     this_.products = snapshot.val()
+                // })
+                // Enable search input
+                $('.search > input').prop('disabled', false);
+                $('.search > input').removeClass('search-disable');
+
+            } else {
+                this.auth = false
+                // disable search input
+                $('.search > input').prop('disabled', true);
+                $('.search > input').addClass('search-disable');
+            }
+        })
+    },
   data() {
     return {
       transitionName: 'slide-left',
+      auth: null,
+      products: null
     }
   },
   beforeRouteUpdate(to, from, next) { // Provider
-    if (this.Auth) {
+    if (this.auth) {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
       next()
-    } else {
-      $('#popup-please-login').modal('show')
     }
   },
   methods: {
-    plsLogin() {
-      $('#popup-please-login').modal('show')
-    }
+    login() {
+      if (!this.auth) {
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).then( function() {
+          const provider = new firebase.auth.FacebookAuthProvider()
+            return firebase.auth().signInWithPopup(provider)
+        }).catch(function(error) { console.log(error) })
+      }
+    },
   },
 }
 </script>
@@ -62,8 +80,17 @@ export default {
 
 
 <style>
+.sign-in {
+  width: 25%;
+  height: 10%;
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
 body {
   padding: 15px 10px 5px 10px;
+  background-image: url('../../assets/loading-bg.jpg');
 }
 @media (max-width: 768px) {
   body {
