@@ -4,7 +4,7 @@
       
       <div class="row products" v-if="Auth && products">
         <div v-if="products.length < 1" class="well">
-          <h2>Server overload Please try again.</h2>
+          <h2>Item not found.</h2>
         </div>
         <div v-for="product in products">
           <div :id='product.article' class="col col-xs-6 col-sm-4 col-md-3 product" @click="viewProduct(product.article, product.tag)">
@@ -37,7 +37,7 @@
                           <!-- Tag -->
                           <div>
                             <div v-for="tag in product.tag" style="float:left; margin: 2px">
-                              <router-link :to="{ name: 'Search', params: {searchVal: tag}}" class="label label-info">{{tag}}</router-link>
+                              <router-link :to="{ name: 'Search', params: {searchVal: tag.toLowerCase()}}" class="label label-info">{{tag.toLowerCase()}}</router-link>
                             </div>
                           </div>
                           <div class="clear:both"></div><br><hr>
@@ -176,11 +176,7 @@ export default {
               $('html, body').stop().animate({
                 scrollTop: productId.offset().top - 80
               }, 400)
-            } catch (e) {
-              location.reload()
-              console.log('OVERLOAD' + e)
-              
-            }
+            } catch (e) {}
           }, 400)
 
           productImg.addClass('col-sm-6')

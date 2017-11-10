@@ -34,7 +34,7 @@
                           <!-- Tag -->
                           <div>
                             <div v-for="tag in product.tag" style="float:left; margin: 2px">
-                              <router-link :to="{ name: 'Search', params: {searchVal: tag}}" class="label label-info">{{tag}}</router-link>
+                              <router-link :to="{ name: 'Search', params: {searchVal: tag.toLowerCase()}}" class="label label-info">{{tag.toLowerCase()}}</router-link>
                               
                             </div>
                           </div>
@@ -199,8 +199,8 @@ export default {
   methods: {
     requestArticle(tags) {
       const this_ = this
-      const path = 'http://localhost:5000'
-      // const path = 'http://grabkeys.net:5000'
+      // const path = 'http://localhost:5000'
+      const path = 'http://grabkeys.net:5000'
       var currentProduct = []
       var num = 0
       axios.post(path, tags).then( response => {

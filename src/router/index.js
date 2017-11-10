@@ -15,8 +15,9 @@ import Cart from '@/components/Store/Cart'
 import Search from '@/components/Store/Search'
 
 
-import Json from '@/components/Json'
 
+import Json from '@/components/Json'
+import Update from '@/components/Update'
 Vue.use(Router)
 
 
@@ -38,6 +39,7 @@ export default new Router({
         { path: '/cart/:article', component: Cart, name: 'Cart', meta: { requiresAuth: true }},
         { path: '/json', component: Json, name: 'Json', meta: { requiresAuth: true }},
         { path: '/search/:searchVal', component: Search, name: 'Search', meta: { requiresAuth: true}},
+        { path: '/update', component: Update, name: 'Update', meta: { requiresAuth: true }}
       ]
     }
   ]

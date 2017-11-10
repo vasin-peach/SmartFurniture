@@ -140,7 +140,7 @@ export default {
                     // Create tags for search list
                     for (var i in products) {
                         searchAll = searchAll.concat(products[i].tag)
-                        searchAll.push(products[i].name)
+                        searchAll.push(products[i].name.toLowerCase())
                         searchAll = searchAll.filter(function(elem, index, self) {
                             return index == self.indexOf(elem);
                         })
