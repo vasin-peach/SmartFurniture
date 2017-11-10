@@ -199,7 +199,8 @@ export default {
   methods: {
     requestArticle(tags) {
       const this_ = this
-      const path = 'http://localhost:5000'
+      // const path = 'http://localhost:5000'
+      const path = 'http://grabkeys.net:5000'
       var currentProduct = []
       var num = 0
       axios.post(path, tags).then( response => {
