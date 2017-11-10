@@ -26,7 +26,7 @@
                         <h2><strong class="text-left">{{ products.price }}<b style="color:green">฿</b></strong></h2>
                     </div>
                     <hr>
-                    <button class="btn btn-success btn-lg" @click="buyProduct()"><i class="fa fa-shopping-cart" aria-hidden="true"> Buy</i></button>
+                    <button class="btn btn-success btn-lg" @click="buyProduct(products.tag)"><i class="fa fa-shopping-cart" aria-hidden="true"> Buy</i></button>
                 </div>
             </div>
         </div>
@@ -65,7 +65,7 @@ export default {
         // })
     },
     methods: {
-        buyProduct() {
+        buyProduct(getTag) {
             const this_ = this
             const dataSet = {
                 userName: this.Auth.displayName,
@@ -90,6 +90,22 @@ export default {
                 })
                 }
             })
+
+            // // view product interested 
+            // var uid = this.auth.uid
+            // var db = firebase.database()
+            // var dataRef = db.ref('users/').orderByChild('uid').equalTo(uid).once('value', function(snapshot) {
+            //     for (var i in snapshot.val()) {
+            //     var userKey = i
+            //     }
+            //     for (var x in getTag) {
+            //     var cTag = getTag[x]
+            //     var tagsRef = firebase.database().ref('users/').child(userKey).child('tags').child(cTag)
+            //     tagsRef.transaction(function(cTag) {
+            //         return cTag + 1
+            //     })
+            //     }
+            // })
 
 
             firebase.database().ref('history/').push(dataSet).then(function() {

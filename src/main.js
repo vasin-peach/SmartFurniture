@@ -14,6 +14,7 @@ import router from './router'
 
 
 
+
 // Login Provider
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) { // if route have meta requiresAuth

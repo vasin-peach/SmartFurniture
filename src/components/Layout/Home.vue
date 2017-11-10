@@ -1,8 +1,7 @@
 <template>
   <div>
-    {{ userData }}
     <transition name="product-loading">
-      <div class="row products" v-if="auth && products">
+      <div class="row products" v-if="auth && products.length > 0">
         <div v-for="product in products">
           <div :id='product.article' class="col col-xs-6 col-sm-4 col-md-3 product" @click="viewProduct(product.article, product.tag)">
 
@@ -67,7 +66,7 @@
 
 
     <!-- Loading Product -->
-    <div class="body-loading" v-if="!products && auth">
+    <div class="body-loading" v-if="products.length <= 0 && auth">
       <i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw"></i>
     </div>
 
@@ -77,7 +76,7 @@
 </template>
 
 <script>
-
+import axios from 'axios'
 import firebase from 'firebase'
 export default {
   name: 'Home',
@@ -86,9 +85,10 @@ export default {
     return {
       auth: false,
       userData: null,
-      products: null,
+      products: [],
       productLoad: false,
-      currentRoute: this.$route.name
+      currentRoute: this.$route.name,
+      currentProducts: null,
     }
   },
   created() {
@@ -102,24 +102,39 @@ export default {
           if (window.location.pathname == '/home') {
             // loading animate
             this_.productLoad = true
-            // loading product random
-            firebase.database().ref('products/').on('value', function(snapshot) {
-              var allIndex = []
-              var randomData = []
-              var showData = []
-              var pickCount = 24
-              for(var i in snapshot.val()) {
-                allIndex.push(i)
-              }
-              for(var i=0; i<pickCount; i++) {
-                var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
-                randomData.push(snapshot.val()[randomIndex])
-              }
-              this_.productLoad = false
-              this_.products = this_.products.concat(randomData)
-            }, function(error) {
-              console.log(error)
-            })
+            
+            if (this_.user.tags === undefined) { 
+              // loading product random
+              firebase.database().ref('products/').on('value', function(snapshot) {
+                var allIndex = []
+                var randomData = []
+                var showData = []
+                var pickCount = 24
+                for(var i in snapshot.val()) {
+                  allIndex.push(i)
+                }
+                for(var i=0; i<pickCount; i++) {
+                  var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
+                  randomData.push(snapshot.val()[randomIndex])
+                }
+                this_.productLoad = false
+                this_.products = this_.products.concat(randomData)
+              }, function(error) {
+                console.log(error)
+              })
+            } else {
+            // Get user tags
+              firebase.database().ref('users/').orderByChild('uid').equalTo(this_.auth.uid).once('value').then( function(snapshot) {
+                for (var i in snapshot.val()) {
+                  // Request to flask server
+                  this_.requestArticle(snapshot.val()[i].tags)
+                }
+              })
+            }
+
+
+
+
           } 
         }
       }
@@ -139,7 +154,9 @@ export default {
 
 
           //New User
-          if (!this_.user) { 
+          // console.log(this_.user.tags)
+          console.log()
+          if (this_.user.tags === undefined) { 
 
             console.log('[LOAD] New User.')
             // Read random
@@ -162,19 +179,14 @@ export default {
           } else { 
 
             console.log('[LOAD] Old User.')
-            // Read random
-            var allIndex = []
-            var randomData = []
-            var showData = []
-            var pickCount = 24
-            for(var i in this_.Products) {
-              allIndex.push(i)
-            }
-            for(var i=0; i<pickCount; i++) {
-              var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
-              randomData.push(this_.Products[randomIndex])
-            }
-            this_.products = randomData
+
+            // Get user tags
+            firebase.database().ref('users/').orderByChild('uid').equalTo(this_.auth.uid).once('value').then( function(snapshot) {
+              for (var i in snapshot.val()) {
+                // Request to flask server
+                this_.requestArticle(snapshot.val()[i].tags)
+              }
+            })
 
           }
         })
@@ -185,6 +197,32 @@ export default {
     });   
   },
   methods: {
+    requestArticle(tags) {
+      const this_ = this
+      const path = 'http://localhost:5000'
+      var currentProduct = []
+      var num = 0
+      axios.post(path, tags).then( response => {
+        for(var i in response.data) {
+          var current = response.data[i].split('.').join("-")
+          firebase.database().ref('products/').orderByChild('article').equalTo(current).once('value').then( function(snapshot) {
+            for(var x in snapshot.val()) {
+              currentProduct = currentProduct.concat(snapshot.val()[x])
+            }
+            num += 1
+            if (num >= 36) {
+              this_.products = this_.products.concat(currentProduct)
+            }
+            
+          })
+        }
+      })
+      .catch( error => {
+        console.log('Error -> '+ error)
+      })
+    },
+
+
     viewProduct: function(article, getTag) {
 
       // Product Layout
