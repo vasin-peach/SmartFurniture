@@ -6,7 +6,7 @@
         <div>
           <div v-if="!auth">
             <div>
-              <button class="btn btn-primary btn-lg sign-in" @click="login()">Signin With Facebook</button>
+              <button class="btn btn-primary btn-lg sign-in" @click="login()"><i class="fa fa-facebook-square" aria-hidden="true"></i> Login with Facebook</button>
             </div>
           </div>
         </div>
@@ -81,7 +81,7 @@ export default {
 
 <style>
 .sign-in {
-  width: 25%;
+  min-width: 20%;
   height: 10%;
   position: absolute;
   top: 45%;

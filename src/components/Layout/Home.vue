@@ -58,7 +58,7 @@
 
           </div>
         </div>
-        <div class="body-footer" v-if="productLoad" style="padding: 10px 0px 30px">
+        <div class="body-footer" v-if="productLoad" style="padding: 10px 0px 30px; color: #f2f2f2;">
             <i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw"></i>
         </div>
       </div>
@@ -66,7 +66,7 @@
 
 
     <!-- Loading Product -->
-    <div class="body-loading" v-if="products.length <= 0 && auth">
+    <div class="body-loading" v-if="products.length <= 0 && auth" style="color: #f2f2f2;">
       <i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw"></i>
     </div>
 

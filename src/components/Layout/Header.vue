@@ -3,7 +3,10 @@
         <nav class="pc navbar navbar-default navbar-fixed-top">
             <div class="container-fluid row">
                 <div class="navbar-header col col-xs-1 ">
-                    <router-link :to="{ name: 'Home'}" id="home" class="navbar-brand">Smart</router-link>
+                    <router-link :to="{ name: 'Home'}" id="home" class="navbar-brand">
+                        <!-- Smart -->
+                    <img src="../../assets/icon.png" style="height: 43px;">
+                    </router-link>
                     <!-- <a class="navbar-brand">Smart</a> -->
                 </div>
                 <div class="search navbar-left col col-xs-8 inner-addon left-addon">
@@ -60,7 +63,9 @@
                         </li>
                     </transition>
                     <li class="col col-xs-3">
-                        <router-link :to="{ name: 'Home'}" id="home" class="navbar-brand">Smart</router-link>
+                        <router-link :to="{ name: 'Home'}" id="home" class="navbar-brand">
+                            <img src="../../assets/icon.png" style="height: 45px; margin-top: -12px;">
+                        </router-link>
                     </li>       
                 </ul>
             </div>
@@ -242,6 +247,10 @@ export default {
     margin: 0;
     padding: 0;
 }
+
+.navbar {
+    padding-top: 10px;
+}
 .search, .navbar-header, .navbar-right > li {
     padding: 7px;
 }
@@ -286,16 +295,8 @@ export default {
     .navbar-right > li:not(.profile-img):hover > a:not(.navbar-brand){
         background-color: #e8e8e8;
     }
-    .navbar-right 
     .navbar-header {
         padding-left: 25px;
-    }
-    .navbar-brand {
-        padding-top: 10px;
-        width: 100%;
-        height: 40px;
-        border-radius: 30px;
-        
     }
 
 
