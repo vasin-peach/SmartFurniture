@@ -151,43 +151,35 @@ export default {
             // Create user data
             this_.user = snapshot.val()[i]
           }
-
-
-          //New User
-          // console.log(this_.user.tags)
-          console.log()
-          if (this_.user.tags === undefined) { 
-
-            console.log('[LOAD] New User.')
-            // Read random
-            var allIndex = []
-            var randomData = []
-            var showData = []
-            var pickCount = 24
-            for(var i in this_.Products) {
-              allIndex.push(i)
-            }
-            for(var i=0; i<pickCount; i++) {
-              var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
-              randomData.push(this_.Products[randomIndex])
-            }
-            this_.products = randomData
-
-
-
-          //Old User
-          } else { 
-
-            console.log('[LOAD] Old User.')
-
-            // Get user tags
-            firebase.database().ref('users/').orderByChild('uid').equalTo(this_.auth.uid).once('value').then( function(snapshot) {
-              for (var i in snapshot.val()) {
-                // Request to flask server
-                this_.requestArticle(snapshot.val()[i].tags)
+          try {
+            if (this_.user.tags === undefined) { 
+              console.log('[LOAD] New User.')
+              // Read random
+              var allIndex = []
+              var randomData = []
+              var showData = []
+              var pickCount = 24
+              for(var i in this_.Products) {
+                allIndex.push(i)
               }
-            })
-
+              for(var i=0; i<pickCount; i++) {
+                var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
+                randomData.push(this_.Products[randomIndex])
+              }
+              this_.products = randomData
+            //Old User
+            } else { 
+              console.log('[LOAD] Old User.')
+              // Get user tags
+              firebase.database().ref('users/').orderByChild('uid').equalTo(this_.auth.uid).once('value').then( function(snapshot) {
+                for (var i in snapshot.val()) {
+                  // Request to flask server
+                  this_.requestArticle(snapshot.val()[i].tags)
+                }
+              })
+            }
+          }catch(e) {
+            
           }
         })
         
