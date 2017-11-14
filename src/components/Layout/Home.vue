@@ -102,36 +102,38 @@ export default {
           if (window.location.pathname == '/home') {
             // loading animate
             this_.productLoad = true
-            
-            if (this_.user.tags === undefined) { 
-              // loading product random
-              firebase.database().ref('products/').on('value', function(snapshot) {
-                var allIndex = []
-                var randomData = []
-                var showData = []
-                var pickCount = 24
-                for(var i in snapshot.val()) {
-                  allIndex.push(i)
-                }
-                for(var i=0; i<pickCount; i++) {
-                  var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
-                  randomData.push(snapshot.val()[randomIndex])
-                }
-                this_.productLoad = false
-                this_.products = this_.products.concat(randomData)
-              }, function(error) {
-                console.log(error)
-              })
-            } else {
-            // Get user tags
-              firebase.database().ref('users/').orderByChild('uid').equalTo(this_.auth.uid).once('value').then( function(snapshot) {
-                for (var i in snapshot.val()) {
-                  // Request to flask server
-                  this_.requestArticle(snapshot.val()[i].tags)
-                }
-              })
+            try {
+              if (this_.user.tags === undefined) { 
+                // loading product random
+                firebase.database().ref('products/').on('value', function(snapshot) {
+                  var allIndex = []
+                  var randomData = []
+                  var showData = []
+                  var pickCount = 24
+                  for(var i in snapshot.val()) {
+                    allIndex.push(i)
+                  }
+                  for(var i=0; i<pickCount; i++) {
+                    var randomIndex = allIndex[Math.floor(Math.random() * allIndex.length)]
+                    randomData.push(snapshot.val()[randomIndex])
+                  }
+                  this_.productLoad = false
+                  this_.products = this_.products.concat(randomData)
+                }, function(error) {
+                  console.log(error)
+                })
+              } else {
+              // Get user tags
+                firebase.database().ref('users/').orderByChild('uid').equalTo(this_.auth.uid).once('value').then( function(snapshot) {
+                  for (var i in snapshot.val()) {
+                    // Request to flask server
+                    this_.requestArticle(snapshot.val()[i].tags)
+                  }
+                })
+              }
+            }catch(e) {
+              
             }
-
 
 
 
