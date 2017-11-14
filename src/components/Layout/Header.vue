@@ -165,7 +165,10 @@ export default {
                     'uid': this.auth.uid,
                     'name': this.auth.displayName,
                     'email': this.auth.email,
-                    'phone': this.auth.phoneNumber
+                    'phone': this.auth.phoneNumber,
+                    "tags": {
+                        'white': 1
+                    }
                 }
                 firebase.database().ref('users/').orderByChild('uid').equalTo(this.auth.uid).once('value').then( function(snapshot) {
                     // Check is exist
