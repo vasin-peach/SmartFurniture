@@ -85,44 +85,7 @@ export default {
     created() {
         const this_ = this
         var ref = firebase.database().ref('products/')
-        // var currentSearch = this.$route.params.searchVal
-        // var count = 0
-        // firebase.auth().onAuthStateChanged(user => { if (user) { this.auth = user } else { this.auth = false } });
-        // if (currentSearch && !this_.products) {
-        //     ref.orderByChild('name').equalTo(currentSearch.toUpperCase()).once('value', function(snapshot) {
-        //       this_.products = snapshot.val()
-        //       while (!this_.products) {
-        //         ref.orderByChild('tag/' + count).equalTo(currentSearch).once('value', function(snapshot) {
-        //             this_.products = snapshot.val()
-        //         }, function(error) {
-        //           console.log(error, 'error inside')
-        //         })
-        //         count ++
-        //         if (count > 10) { console.log('Search Not Found'); break }
-        //       }
-        //     }, function(error) {
-        //       console.log(error, 'error outside')
-        //     })
-        // } else {
-        //   console.log('Search Not Found Somthing')
-        //   router.push('Home')
-        // }
-
-        // var currentSearch = window.location.pathname.split('/')
-        // currentSearch = currentSearch[currentSearch.length-1]
-        // var currentSearch = this.path
-
-        // for(var i in this_.Products) {
-        //   var currentTag = this_.Products[i].tag
-        //   var currentName = this_.Products[i].name
-          
-        //   if (currentTag.indexOf(currentSearch) > 0 || currentName == currentSearch.toUpperCase()) {
-        //     this_.products = this_.products.concat(this_.Products[i])
-        //   }
-        // }
-
         this.fetchData()
-        
     },
     props: ['Auth', 'Products'],
     data() {
@@ -136,6 +99,8 @@ export default {
       }
     },
     methods: {
+
+      // Fetch data
       fetchData: function() {
         const this_ = this
         var currentSearch = this.path

@@ -13,7 +13,7 @@ import firebase from 'firebase'
 export default {
     name: 'Json',
     created() {
-
+        // Update Product to database
         // Check Product Up to date.
         var check = jsonFile[jsonFile.length-1].article
         firebase.database().ref('products/').orderByChild("article").equalTo(check).once('value').then( function(snapshot) {

@@ -229,17 +229,10 @@ export default {
         
     }
 }
-
 </script>
 
 
-
-
-
 <style>
-/* .nav .col-xs-3, .nav .col-xs-4  {
-    transition: all .5s
-} */
 .mobile {
     display: none;
 }
@@ -268,8 +261,6 @@ export default {
             border-bottom-left-radius: 30px;
         }
         
-
-
 .navbar-right > li {
     float: right;
     white-space:nowrap;

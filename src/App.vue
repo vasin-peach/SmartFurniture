@@ -5,16 +5,7 @@
         <router-view name="header"></router-view>
         <router-view :Auth="auth" :Products="products" name="body"></router-view>
       </div>
-      <!-- <div v-if="auth && !products" class="body2-loading">
-          <i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw" v-if="!products || auth"></i>
-      </div>
-      <div v-if="!auth && !products" class="body-2-load">
-        <div class="signin">
-          <button class="btn btn-primary btn-lg" @click="login()">Signin with Facebook</button>
-        </div>
-      </div> -->
     </div>
-
   </transition>
 </template>
 
@@ -44,17 +35,6 @@ export default {
       }
     })
   },
-  // methods: {
-  //       login() {
-  //           if (!this.Auth) {
-  //               firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).then( function() {
-  //                   const provider = new firebase.auth.FacebookAuthProvider()
-  //                   return firebase.auth().signInWithPopup(provider)
-  //               }).catch(function(error) { console.log(error) })
-  //           }
-  //       },
-  // }
-
 }
 
 </script>

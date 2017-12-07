@@ -34,10 +34,6 @@ export default {
             if (user) {
                 // return user
                 this.auth = user
-                // // return product
-                // firebase.database().ref('products/').once('value').then( function(snapshot) {
-                //     this_.products = snapshot.val()
-                // })
                 // Enable search input
                 $('.search > input').prop('disabled', false);
                 $('.search > input').removeClass('search-disable');

@@ -103,7 +103,7 @@ export default {
             // loading animate
             this_.productLoad = true
             try {
-              if (this_.user.tags === undefined) { 
+              if (this_.user.tags === undefined) { // New User
                 // loading product random
                 firebase.database().ref('products/').on('value', function(snapshot) {
                   var allIndex = []
@@ -122,7 +122,7 @@ export default {
                 }, function(error) {
                   console.log(error)
                 })
-              } else {
+              } else { // Old User
               // Get user tags
                 firebase.database().ref('users/').orderByChild('uid').equalTo(this_.auth.uid).once('value').then( function(snapshot) {
                   for (var i in snapshot.val()) {
@@ -131,12 +131,7 @@ export default {
                   }
                 })
               }
-            }catch(e) {
-              
-            }
-
-
-
+            }catch(e) {}
           } 
         }
       }

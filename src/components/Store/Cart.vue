@@ -55,14 +55,6 @@ export default {
                 this_.products = this_.Products[current]
             }
         }
-
-        // var db = firebase.database().ref('products/')
-        // db.orderByChild('article').equalTo(this_.article).once('value', function(snapshot) {
-        //     for (var i in snapshot.val()) {
-        //         this_.prodct = snapshot.val()[i]
-        //     }
-        //     this_.buyItem()
-        // })
     },
     methods: {
         buyProduct(getTag) {
@@ -90,23 +82,6 @@ export default {
                 })
                 }
             })
-
-            // // view product interested 
-            // var uid = this.auth.uid
-            // var db = firebase.database()
-            // var dataRef = db.ref('users/').orderByChild('uid').equalTo(uid).once('value', function(snapshot) {
-            //     for (var i in snapshot.val()) {
-            //     var userKey = i
-            //     }
-            //     for (var x in getTag) {
-            //     var cTag = getTag[x]
-            //     var tagsRef = firebase.database().ref('users/').child(userKey).child('tags').child(cTag)
-            //     tagsRef.transaction(function(cTag) {
-            //         return cTag + 1
-            //     })
-            //     }
-            // })
-
 
             firebase.database().ref('history/').push(dataSet).then(function() {
                 alert('สั่งซื้อสินค้าเสร็จสิ้น')
