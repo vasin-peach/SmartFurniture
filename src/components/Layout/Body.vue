@@ -1,20 +1,22 @@
 <template>
   <div>
-    <!-- Body Container -->
-    <div class="container-fluid body">
-      <transition name="body-fade">
-        <div>
-          <div v-if="!auth">
-            <div>
-              <button class="btn btn-primary btn-lg sign-in" @click="login()"><i class="fa fa-facebook-square" aria-hidden="true"></i> Login with Facebook</button>
+    <transition :name="routeChange">
+      <!-- Body Container -->
+      <div class="container-fluid body">
+        <transition name="body-fade">
+          <div>
+            <div v-if="!auth">
+              <div>
+                <button class="btn btn-primary btn-lg sign-in" @click="login()"><i class="fa fa-facebook-square" aria-hidden="true"></i> Login with Facebook</button>
+              </div>
             </div>
           </div>
-        </div>
-      </transition>
-      <transition :name="transitionName" mode="out-in">
-        <router-view :Auth="auth" :Products="Products" class="body-container"></router-view>
-      </transition>
-    </div>
+        </transition>
+        <transition :name="transitionName" mode="out-in">
+          <router-view :Auth="auth" :Products="Products" class="body-container"></router-view>
+        </transition>
+      </div>
+    </transition>
 
   </div>
 </template>
@@ -52,16 +54,15 @@ export default {
     return {
       transitionName: 'slide-left',
       auth: null,
-      products: null
+      products: null,
+      routeChange: 'slide-left'
     }
   },
-  beforeRouteUpdate(to, from, next) { // Provider
-    if (this.auth) {
-      const toDepth = to.path.split('/').length
-      const fromDepth = from.path.split('/').length
-      this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
-      next()
-    }
+  beforeRouteUpdate (to, from, next) {
+    const toDepth = to.path.split('/').length
+    const fromDepth = from.path.split('/').length
+    this.routeChange = toDepth < fromDepth ? 'slide-right' : 'slide-left'
+    next()
   },
   methods: {
     login() {
